@@ -8,7 +8,7 @@ import tty
 import traceback
 
 print '[[[Opening', sys.argv[1], ']]]'
-f = serial.Serial(sys.argv[1])
+f = serial.Serial(sys.argv[1], int(sys.argv[2]))
 FD = f.fileno()
 print '[[[FD=', FD, ']]]'
 old = termios.tcgetattr(sys.stdin.fileno())
