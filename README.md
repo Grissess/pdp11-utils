@@ -73,3 +73,11 @@ Remember to use a null-modem or crossover cable! Both the computer you run this 
 Prints to stdout a (binary!) file consisting of the ODT commands required to set the memory of a PDP-11 to whatever would be loaded by the tape. If the tape sets PC, this will cause the PDP to run it, assuming HALT isn't set. Note that this makes absolutely no assumptions about memory mapping, valid addresses, errors during the upload, etc.; it just generates an offline file that *might* work if you cat it to the serial console while ODT is running. (Throttling may be required; tinycom.py can help you with this.) Files generated this way will be several times bigger than tape formats (because of the octal encoding) and nigh impossible to recover data from, and so they are generally unsuitable for distribution. Also, you can't just do this with a "raw" image (or an a.out, for that matter), but using mkterp.py with `-O 0 -d image` is fairly trivial, if a nuisance. Remember to redirect this to a file!
 
 This program does *not* validate the tape using the embedded checksums. shterp.py with `-s` will do this for you. And, of course, if the file is the immediate output of mkterp.py (and I don't suck at programming), it should be valid anyway.
+
+## unoct.py
+
+Reads, from stdin, a sequence of whitespace-separated octal groups, and writes them to stdout as 16-bit words. Note that this will write one 16-bit word per octal group, regardless of whether or not the group could fit in a byte.
+
+## bload.bin
+
+This is the *paper tapebootloader program*, circuitously in the form of a standard tape. Use `mkodt.py` to transform this into ODT commands, or `shterp.py` to get a binary image, etc.
