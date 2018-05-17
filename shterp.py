@@ -57,45 +57,46 @@ for tape in tapes:
         hdr = tf.read(6)
         if len(hdr)<6:
             if atend:
-                print '%s: End of tape. (%d bytes extraneous data.)'%(tape, len(hdr))
+                print '%s: End of tape. (%d/0%o/0x%x bytes extraneous data.)'%(tape, len(hdr), len(hdr), len(hdr))
             else:
                 print '%s: Unexpected end of tape'%(tape,)
             break
         atend=False
         magic, size, orig = struct.unpack('<HHH', hdr)
         if magic != 1:
-            print '%s: Expected 1 in header, found %d'%(tape, magic)
+            print '%s: Expected 1 in header, found %d/0%o/0x%x'%(tape, magic, magic, magic)
             if strict:
                 continue
         if size < 6:
-            print '%s: Expected size 6 or greater, found %d'%(tape, size)
+            print '%s: Expected size 6 or greater, found %d/0%o/0x%x'%(tape, size, size, size)
             if strict:
                 continue
         if size == 6:
-            print '%s: End of tape, PC = %d %s'%(tape, orig, '(default)' if orig==1 else '')
+            print '%s: Set PC = %d/0%o/0x%x %s'%(tape, orig, orig, orig, '(default)' if orig==1 else '')
             if orig != 1:
                 setPC = orig
             atend = True
-            continue
-        # size > 6
-        print '%s: Datablock of %d bytes to load at %d'%(tape, size-6, orig)
-        data = tf.read(size-6)
-        if len(data) < size-6:
-            print '%s: Datablock unexpectedly truncated'
-            continue
+            data = ''
+        if size > 6:
+            print '%s: Datablock of %d/0%o/0x%x bytes to load at %d/0%o/0x%x'%(tape, size-6, size-6, size-6, orig, orig, orig)
+            data = tf.read(size-6)
+            if len(data) < size-6:
+                print '%s: Datablock unexpectedly truncated'
+                continue
         csc = csum(hdr+data)
         csf = ord(tf.read(1))
         if csc != csf:
-            print '%s: Bad csum, expected %d, got %d'%(tape, csc, csf)
+            print '%s: Bad csum, expected %d/0%o/0x%x, got %d/0%o/0x%x'%(tape, csc, csc, csc, csf, csf, csf)
             if strict:
                 continue
         else:
-            print '%s: Good csum (%d)'%(tape, csc)
-        if outtape:
-            outtape.write(hdr+data+chr(csc))
-        if mergefile:
-            merge.seek(orig)
-            merge.write(data)
+            print '%s: Good csum %d/0%o/0x%x'%(tape, csc, csc, csc)
+        if size > 6:
+            if outtape:
+                outtape.write(hdr+data+chr(csc))
+            if mergefile:
+                merge.seek(orig)
+                merge.write(data)
 
 if mergefile:
     mergefile.write(merge.getvalue())
